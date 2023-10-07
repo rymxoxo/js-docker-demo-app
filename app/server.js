@@ -4,7 +4,8 @@ let fs = require('fs');
 let MongoClient = require('mongodb').MongoClient;
 let bodyParser = require('body-parser');
 let app = express();
-
+const cors = require('cors');
+app.use(cors());
 app.use(bodyParser.urlencoded({
   extended: true
 }));
@@ -12,7 +13,7 @@ app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, "index.html"));
-  });
+});
 
 app.get('/profile-picture', function (req, res) {
   let img = fs.readFileSync(path.join(__dirname, "images/profile-1.jpg"));
@@ -20,17 +21,12 @@ app.get('/profile-picture', function (req, res) {
   res.end(img, 'binary');
 });
 
-// use when starting application locally
-let mongoUrlLocal = "mongodb://admin:password@localhost:27017";
+// use private IP since MongoDB is on the same instance
+let mongoUrlLocal = "mongodb://admin:password@172.31.57.105:27017";
 
-// use when starting application as docker container
-let mongoUrlDocker = "mongodb://admin:password@mongodb";
-
-// pass these options to mongo client connect request to avoid DeprecationWarning for current Server Discovery and Monitoring engine
 let mongoClientOptions = { useNewUrlParser: true, useUnifiedTopology: true };
 
-// "user-account" in demo with docker. "my-db" in demo with docker-compose
-let databaseName = "my-db";
+let databaseName = "user-account";
 
 app.post('/update-profile', function (req, res) {
   let userObj = req.body;
